@@ -1,0 +1,72 @@
+.signUpForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.signUpFormInputDiv {
+    margin-bottom: 1rem;
+    width: 30%;
+}
+
+.signUpFormInputDiv label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.signUpFormInputDiv .input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.signUpFormInputDiv .invalidInput {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    border-color: red;
+}
+
+.signUpFormInputError {
+    color: red;
+    font-size: 12px;
+
+}
+
+.signUpFormButton {
+    cursor: pointer;
+    background-color: #0074D9;
+    width: 120px;
+    height: 40px;
+    border: 1px solid black;
+    border-radius: 2px;
+    color: white;
+}
+
+.signUpFormButton:hover {
+    background-color: white;
+    color: #0074D9;
+}
+
+.signUpFormButton:disabled {
+    cursor: not-allowed;
+}
+
+.switchFormP {
+    color: #0074D9;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.authSuccessMessage{
+    color: green;
+    font-size: 12px;
+}
