@@ -51,13 +51,15 @@ export const AuthProvider = ({ children }) => {
   console.log(userData);
   
   const authContextRegister = async (user) => {
+    console.log(user);
+    
     setIsLoading(true);
     try {
       const res = await register(user);
       console.log("Registered successfully!");
       return res;
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error("Registration failed:", error.response?.data?.message);
       throw error;
     } finally {
       setIsLoading(false);

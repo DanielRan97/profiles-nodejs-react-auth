@@ -1,14 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
 // Set up the base URL for your API
 export const API = axios.create({
-  baseURL: 'http://localhost:4000/auth', // Replace with your API base URL
+  baseURL: "http://localhost:4000/auth", // Replace with your API base URL
 });
 
 // Request interceptor to attach the token
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('profilesAuthToken');
+    const token = localStorage.getItem("profilesAuthToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // Attach token to Authorization header
     }
@@ -25,7 +25,6 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-
     if (error.response?.status === 401) {
       console.error("Unauthorized or token expired.");
       // Clear localStorage and redirect to login
@@ -37,16 +36,18 @@ API.interceptors.response.use(
 );
 
 // Register function
-export const register = async ({ fullName, nickName, password }) => {
+export const register = async ({ fullName, nickName, password, email }) => {
+
   try {
-    const response = await API.post('/register', {
+    const response = await API.post("/register", {
       fullName,
+      email,
       nickName,
       password,
     });
     return response.data;
   } catch (error) {
-    console.error('Registration error:', error.response?.data || error.message);
+    console.error("Registration error:", error.response?.data.error.message || error.message);
     throw error;
   }
 };
@@ -54,16 +55,14 @@ export const register = async ({ fullName, nickName, password }) => {
 // Login function
 export const login = async ({ nickName, password }) => {
   try {
-    const response = await API.post('/login', {
+    const response = await API.post("/login", {
       nickName,
       password,
     });
-    localStorage.setItem('profilesAuthToken', response.data.token);
+    localStorage.setItem("profilesAuthToken", response.data.token);
     return response.data;
   } catch (error) {
     console.error(error.response?.data || error.message);
     throw error;
   }
 };
-
-

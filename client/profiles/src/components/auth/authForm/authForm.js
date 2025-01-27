@@ -1,10 +1,10 @@
 import { useState } from "react";
-import classes from "./signUp.module.css";
+import classes from "./authForm.module.css";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../../contexts/authContext";
 
-const SignUp = () => {
+const AuthForm = () => {
   const navigate = useNavigate();
   const { authContextLogin, authContextRegister } = useContext(AuthContext);
   const [formType, setFormType] = useState("signUp");
@@ -20,7 +20,19 @@ const SignUp = () => {
         max: 20,
       },
       error: "",
-      terget: "signUp",
+      target: "signUp",
+    },
+    email: {
+      value: "",
+      type: "email",
+      name: "Email",
+      valid: {
+        validator: function (email) {
+          return /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+        },
+      },
+      error: "",
+      target: "signUp",
     },
     nickName: {
       value: "",
@@ -31,7 +43,7 @@ const SignUp = () => {
         max: 20,
       },
       error: "",
-      terget: "login signUp",
+      target: "login signUp",
     },
     password: {
       value: "",
@@ -42,17 +54,18 @@ const SignUp = () => {
         max: 20,
       },
       error: "",
-      terget: "login signUp",
+      target: "login signUp",
     },
   });
 
-  // Handle input change and validation
   const inputHandler = (val, key) => {
-    const { min, max } = signUpFormState[key].valid;
-
+    const { min, max } = signUpFormState[key].valid || {};
     const error =
-      val.length < min || val.length > max
+      min && max && (val.length < min || val.length > max)
         ? `${signUpFormState[key].name} length must be between ${min} and ${max} characters.`
+        : signUpFormState[key].valid?.validator &&
+          !signUpFormState[key].valid.validator(val)
+        ? `${signUpFormState[key].name} is not valid.`
         : "";
 
     setSignUpFormState((prev) => ({
@@ -64,11 +77,9 @@ const SignUp = () => {
       },
     }));
   };
-
-  // Check if the form is valid
   const isFormValid = () => {
     return Object.values(signUpFormState).every((field) => {
-      if (formType !== "signUp" && !field.terget.includes("login signUp")) {
+      if (!field.target.includes(formType)) {
         return true;
       }
       return field.error === "" && field.value.trim() !== "";
@@ -79,26 +90,27 @@ const SignUp = () => {
     setAuthSuccess("");
     setFormError("");
     if (formType === "signUp") {
-      let user = {
+      const user = {
         fullName: signUpFormState.fullName.value,
         nickName: signUpFormState.nickName.value,
+        email: signUpFormState.email.value,
         password: signUpFormState.password.value,
       };
       try {
         const res = await authContextRegister(user);
         setAuthSuccess(
-          `${signUpFormState.fullName.value} sign up successfully,You can now login`
+          `${signUpFormState.fullName.value} signed up successfully. You can now login.`
         );
         if (res) {
-          console.log(res);
           setFormType("login");
         }
       } catch (error) {
-        console.log(error);
-        setFormError(error.response.data.message);
+        setFormError(
+          error.response.data.error.message || "Sign Up failed."
+        );
       }
     } else {
-      let user = {
+      const user = {
         nickName: signUpFormState.nickName.value,
         password: signUpFormState.password.value,
       };
@@ -106,26 +118,28 @@ const SignUp = () => {
         await authContextLogin(user);
         navigate("/profile");
       } catch (error) {
-        setFormError(error.response.data.message);
+        console.error(error.response);
+
+        setFormError(
+          error.response.data.message || "Login failed."
+        );
       }
     }
   };
 
-  let signUpForm = (
-    <form className={classes.signUpForm}>
-      <h1>{formType === "signUp" ? "SIGN UP" : "LOGIN"}</h1>
-      {Object.entries(signUpFormState).map(([key, value]) => {
-        return (
+  return (
+    <div>
+      <form className={classes.signUpForm}>
+        <h1>{formType === "signUp" ? "SIGN UP" : "LOGIN"}</h1>
+        {Object.entries(signUpFormState).map(([key, value]) => (
           <div key={key} className={classes.signUpFormInputDiv}>
-            {value.terget.includes(formType) && (
+            {value.target.includes(formType) && (
               <label>
                 {value.name}
                 <input
-                  className={
-                    value.error !== "" ? classes.invalidInput : classes.input
-                  }
-                  minLength={value.valid.min}
-                  maxLength={value.valid.max}
+                  className={value.error ? classes.invalidInput : classes.input}
+                  minLength={value.valid?.min}
+                  maxLength={value.valid?.max}
                   type={value.type}
                   value={value.value}
                   onChange={(e) => inputHandler(e.target.value, key)}
@@ -136,34 +150,34 @@ const SignUp = () => {
               <p className={classes.signUpFormInputError}>{value.error}</p>
             )}
           </div>
-        );
-      })}
-      {formError !== "" && (
-        <p className={classes.signUpFormInputError}>{formError}</p>
-      )}
-      {authSuccess !== "" && (
-        <p className={classes.authSuccessMessage}>{authSuccess}</p>
-      )}
-      <p
-        className={classes.switchFormP}
-        onClick={() => setFormType(formType === "signUp" ? "login" : "signUp")}
-      >
-        {formType === "signUp"
-          ? "Already have account? Login here"
-          : "Dont have account yet? Sign Up here"}
-      </p>
-      <button
-        disabled={!isFormValid()}
-        className={classes.signUpFormButton}
-        type="button"
-        onClick={() => authHandler()}
-      >
-        {formType === "signUp" ? "SIGN UP" : "LOGIN"}
-      </button>
-    </form>
+        ))}
+        {formError && (
+          <p className={classes.signUpFormInputError}>{formError}</p>
+        )}
+        {authSuccess && (
+          <p className={classes.authSuccessMessage}>{authSuccess}</p>
+        )}
+        <p
+          className={classes.switchFormP}
+          onClick={() =>
+            setFormType(formType === "signUp" ? "login" : "signUp")
+          }
+        >
+          {formType === "signUp"
+            ? "Already have an account? Login here."
+            : "Don't have an account yet? Sign up here."}
+        </p>
+        <button
+          disabled={!isFormValid()}
+          className={classes.signUpFormButton}
+          type="button"
+          onClick={authHandler}
+        >
+          {formType === "signUp" ? "SIGN UP" : "LOGIN"}
+        </button>
+      </form>
+    </div>
   );
-
-  return <div>{signUpForm}</div>;
 };
 
-export default SignUp;
+export default AuthForm;
