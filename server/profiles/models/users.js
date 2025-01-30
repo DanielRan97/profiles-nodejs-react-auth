@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const path = require("path");
 
 const userSchema = new mongoose.Schema(
   {
@@ -36,11 +38,15 @@ const userSchema = new mongoose.Schema(
       maxlength: 20,
       validate: {
         validator: function (value) {
-          return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{6,20}$/.test(value);
+          return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{6,20}$/.test(
+            value
+          );
         },
-        message: "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.",
+        message:
+          "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.",
       },
     },
+    profileImage: { type: String, required: false }, // Image URL
   },
   { timestamps: true }
 );
@@ -58,6 +64,32 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.validatePassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
+
+// Auto-delete profile image when user is removed
+userSchema.pre("remove", async function (next) {
+  if (this.profileImage) {
+    try {
+      // Extract filename from the URL
+      const imageFilename = this.profileImage.split("/").pop();
+      const imagePath = path.join(
+        __dirname,
+        "../../profileImgs",
+        imageFilename
+      );
+
+      // Check if file exists before deleting
+      if (fs.existsSync(imagePath)) {
+        fs.unlink(imagePath, (err) => {
+          if (err) console.error("Error deleting profile image:", err);
+          else console.log("Profile image deleted:", imagePath);
+        });
+      }
+    } catch (error) {
+      console.error("Error handling profile image deletion:", error);
+    }
+  }
+  next();
+});
 
 // Post-save middleware for unique constraint errors
 userSchema.post("save", function (error, doc, next) {

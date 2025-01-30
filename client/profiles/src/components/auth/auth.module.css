@@ -26,7 +26,7 @@
     border-radius: 4px;
 }
 
-.signUpFormInputDiv .invalidInput {
+ .invalidInput {
     width: 100%;
     padding: 0.5rem;
     font-size: 1rem;
@@ -49,6 +49,10 @@
     border: 1px solid black;
     border-radius: 2px;
     color: white;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
 }
 
 .signUpFormButton:hover {

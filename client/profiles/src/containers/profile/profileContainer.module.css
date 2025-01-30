@@ -1,0 +1,6 @@
+.profileContainer{
+    padding: 30px;
+    display: flex;
+    align-items: flex-start baseline;
+    justify-content: space-between;
+}

@@ -13,7 +13,6 @@
 }
 
 .logOutButton{
-    margin-right: 20px;
     cursor: pointer;
     height: 27px;
     width: 90px;
@@ -31,3 +30,15 @@
     color: #FAF9F6;
     border: 1px solid black;
 }
+
+.nav .profileImg{
+height: 65px;
+width: 65px;
+cursor: pointer;
+margin-right: 10px;
+border-radius: 50%;
+}
+
+.nav .profileImg:hover{
+    opacity: 0.80
+    }

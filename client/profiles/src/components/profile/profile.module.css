@@ -1,0 +1,54 @@
+.profile {
+  display: flex;
+  align-items: center;
+}
+
+.profileImgWrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.profileImg {
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  /* Circular image */
+  transition: opacity 0.3s ease;
+}
+
+.profileImg:hover {
+  opacity: 0.7;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  border-radius: 50%;
+  /* Match the image shape */
+  transition: opacity 0.3s ease;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.profileImgWrapper:hover .overlay {
+  opacity: 1;
+}
+
+.profileTitle {
+  margin-left: 30px;
+  font-size: 18px;
+}
+
+.profileImgDiv{
+  margin-left: 10px;
+}

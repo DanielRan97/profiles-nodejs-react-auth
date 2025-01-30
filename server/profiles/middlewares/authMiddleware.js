@@ -9,7 +9,8 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET); // Verify token
-    req.body.user = decoded; // Attach the decoded user info to the request object
+    req.user = decoded; // ✅ Attach decoded user to `req.user`, NOT `req.body`
+
     next(); // Continue to the next middleware or route handler
   } catch (error) {
     if (error.name === "TokenExpiredError") {

@@ -1,34 +1,40 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const cors = require("cors");
-
-
+const http = require("http");
+const chalk = require("chalk");
 const app = express();
 const PORT = 4000;
 
-// Middleware
-app.use(bodyParser.json());
+// Create HTTP server for Socket.IO
+const server = http.createServer(app);
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-  })
-);
+// Initialize Socket.IO
+const initializeSocket = require("./socketIo/socketIo");
+initializeSocket(server);
+
+// Middleware
+app.use(cors({ origin: "http://localhost:3000" }));
+app.use(express.json()); // ✅ Use ONLY express.json() for parsing JSON
 
 // Database connection
 const MONGO_URI = "mongodb://localhost:27017/profiles";
-mongoose.connect(MONGO_URI);
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connection.on("connected", () => {
-  console.log("Connected to MongoDB");
+  console.log(chalk.black.bold.bgGreen("Connected to MongoDB"));
 });
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/chat", chatRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// ✅ Start server correctly
+server.listen(PORT, () => {
+  console.log(chalk.black.bold.bgWhite(`Server running on http://localhost:${PORT}`));
 });

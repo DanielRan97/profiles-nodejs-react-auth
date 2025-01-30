@@ -6,7 +6,6 @@ const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } = useContext(AuthContext);
 
   if (!isLoggedIn) {
-    console.log("private router user connect:" , isLoggedIn);
 
     return <Navigate to="/auth" />;
   }

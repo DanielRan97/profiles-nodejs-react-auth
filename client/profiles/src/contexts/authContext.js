@@ -1,13 +1,28 @@
-import React, { createContext, useState, useEffect } from "react";
-import { register, login, API } from "../axios/auth";
+import React, { createContext, useState, useEffect, useCallback } from "react";
+import { register, login, API, editUser } from "../axios/auth";
 import { jwtDecode } from "jwt-decode";
+import io from "socket.io-client";
 
 export const AuthContext = createContext();
 
+// Create the socket instance outside the component to prevent re-creation
+const socket = io("http://localhost:4000", { autoConnect: false, transports: ["websocket"] });
+
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("profilesAuthToken"));
-    const [userData, setUserData] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("profilesAuthToken")
+  );
+  const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [usersList, setUsersList] = useState([]);
+
+  const authContextLogout = useCallback(() => {
+    localStorage.removeItem("profilesAuthToken");
+    socket.disconnect();
+    setUserData(null);
+    setIsLoggedIn(false);
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     const checkTokenValidity = async () => {
@@ -25,17 +40,31 @@ export const AuthProvider = ({ children }) => {
         const currentTime = Date.now() / 1000;
 
         if (decodedToken.exp < currentTime) {
-          console.error("Token expired, logging out.");
           authContextLogout();
         } else {
           const response = await API.post("/protected", { user: decodedToken });
           setIsLoggedIn(true);
           setUserData({
             fullName: response.data.user.fullName,
+            email: response.data.user.email,
+            profileImage: response.data.user.profileImage,
             nickName: response.data.user.nickName,
             _id: response.data.user._id,
-            createdAt: "2025-01-26T09:07:20.899Z",
           });
+
+          // Connect the socket only once when the user is authenticated
+          if (!socket.connected) {
+            socket.connect();
+            socket.emit("user-join", response.data.user._id);
+            socket.emit("get-online-users");
+
+            // Clean previous listener to prevent duplicate events
+            socket.off("online-users");
+            socket.on("online-users", (users) => {
+              setUsersList(users);
+            });
+          }
+
           console.log("User authenticated with valid token.");
         }
       } catch (error) {
@@ -47,19 +76,58 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkTokenValidity();
+
+    // Cleanup function to remove socket listeners when component unmounts
+    return () => {
+      socket.off("online-users");
+      socket.disconnect();
+    };
+  }, [authContextLogout]);
+
+  useEffect(() => {
+    // Listen for the "online-users" event from the server
+    socket.on("online-users", (users) => {
+      console.log("Received online users:", users);
+      setUsersList(users);
+    });
+
+    // Cleanup listener when component unmounts
+    return () => {
+      socket.off("online-users");
+    };
   }, []);
-  console.log(userData);
+
   
   const authContextRegister = async (user) => {
-    console.log(user);
-    
     setIsLoading(true);
     try {
       const res = await register(user);
-      console.log("Registered successfully!");
       return res;
     } catch (error) {
-      console.error("Registration failed:", error.response?.data?.message);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const authContextEditUser = async (userData) => {
+    setIsLoading(true);
+    let token = localStorage.getItem("profilesAuthToken");
+    const user = {
+      ...userData,
+      token,
+    };
+    try {
+      const response = await editUser(user);
+      setUserData({
+        fullName: response.updatedUser.fullName,
+        email: response.updatedUser.email,
+        profileImage: response.updatedUser.profileImage,
+        nickName: response.updatedUser.nickName,
+        _id: response.updatedUser._id,
+      });
+      return response;
+    } catch (error) {
       throw error;
     } finally {
       setIsLoading(false);
@@ -70,27 +138,40 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await login(user);
+      console.log(response);
+      
       localStorage.setItem("profilesAuthToken", response.token);
       setUserData({
-        fullName: response.user.fullName,
-        nickName: response.user.nickName,
         _id: response.user._id,
-        createdAt: "2025-01-26T09:07:20.899Z",
+        fullName: response.user.fullName,
+        email: response.user.email,
+        profileImage: response.user.profileImage,
+        nickName: response.user.nickName,
       });
+
       setIsLoggedIn(true);
+
+      // Ensure socket connects after login
+      if (!socket.connected) {
+        socket.connect();
+        socket.emit("user-join", response.user._id);
+        socket.emit("get-online-users");
+
+        // Clean previous listener to prevent duplicate events
+        socket.off("online-users");
+        socket.on("online-users", (users) => {
+          setUsersList(users);
+        });
+        return () => {
+          socket.off("online-users");
+        };
+      }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.log(error);
       throw error;
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const authContextLogout = () => {
-    localStorage.removeItem("profilesAuthToken");
-    setUserData(null);
-    setIsLoggedIn(false);
-    setIsLoading(false);
   };
 
   return (
@@ -100,8 +181,10 @@ export const AuthProvider = ({ children }) => {
         authContextLogin,
         authContextRegister,
         authContextLogout,
+        authContextEditUser,
         userData,
         isLoading,
+        usersList
       }}
     >
       {children}
