@@ -1,18 +1,19 @@
-.nav{
+.nav {
     background: #0074D9;
     color: white;
     height: 70px;
-    display:flex ;
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 2px -2px rgba(0,0,0,.2);
+    box-shadow: 0 4px 2px -2px rgba(0, 0, 0, .2);
+    padding: 10px;
 }
 
-.navTitle{
+.navTitle {
     margin-left: 20px;
 }
 
-.logOutButton{
+.logOutButton {
     cursor: pointer;
     height: 27px;
     width: 90px;
@@ -25,20 +26,19 @@
     -o-border-radius: 30px;
 }
 
-.logOutButton:hover{
+.logOutButton:hover {
     background-color: #0074D9;
     color: #FAF9F6;
     border: 1px solid black;
 }
 
-.nav .profileImg{
-height: 65px;
-width: 65px;
-cursor: pointer;
-margin-right: 10px;
-border-radius: 50%;
+.nav .profileImg {
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    border-radius: 50%;
 }
 
-.nav .profileImg:hover{
+.nav .profileImg:hover {
     opacity: 0.80
-    }
+}

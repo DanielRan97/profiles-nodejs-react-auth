@@ -1,4 +1,37 @@
-.usersList{
+.usersList {
     overflow: auto;
-    
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 10px;
+}
+
+.usersListDiv {
+    display: flex;
+    margin-top: 5px;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    width: fit-content;
+    padding: 4px;
+}
+
+.usersListDiv:hover {
+background-color: #61dafb;
+}
+
+.usersListHeader{
+    margin: 0;
+}
+
+.userProfileImg {
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.userNickName {
+    display: inline-block;
 }

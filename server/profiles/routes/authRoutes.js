@@ -115,6 +115,7 @@ router.post("/protected", verifyToken, async (req, res) => {
   }
 });
 
+//Edit User
 router.put("/user/:id", verifyToken, upload.single("profileImage"), async (req, res) => {
   try {
     const { fullName, email, nickName, password } = req.body;
@@ -130,6 +131,38 @@ router.put("/user/:id", verifyToken, upload.single("profileImage"), async (req, 
     res.status(200).json({ message: "User updated successfully", updatedUser });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//Get user by id
+router.get("/user/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.status(200).json({ message: "User Found", user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+//Get All connected User
+router.post("/get-connected-users", verifyToken, async (req, res) => {
+  try {
+    const { connectedUsers } = req.body;
+
+    if (!Array.isArray(connectedUsers) || connectedUsers.length === 0) {
+      return res.status(200).json({ message: "No connected users provided", connectedUsers: [] });
+    }
+
+    const users = await User.find({ _id: { $in: connectedUsers } }, "userName fullName profileImage nickName");
+
+    if (!users || users.length === 0) {
+      return res.status(200).json({ message: "Users not found", connectedUsers: [] });
+    }
+
+    res.status(200).json({ message: "Users found", connectedUsers: users });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

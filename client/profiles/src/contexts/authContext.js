@@ -1,12 +1,14 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
-import { register, login, API, editUser } from "../axios/auth";
+import {
+  register,
+  login,
+  API,
+  editUser,
+  getConnectedUsers,
+} from "../axios/auth";
 import { jwtDecode } from "jwt-decode";
-import io from "socket.io-client";
-
+import { socket } from "../socket/socket";
 export const AuthContext = createContext();
-
-// Create the socket instance outside the component to prevent re-creation
-const socket = io("http://localhost:4000", { autoConnect: false, transports: ["websocket"] });
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -59,10 +61,6 @@ export const AuthProvider = ({ children }) => {
             socket.emit("get-online-users");
 
             // Clean previous listener to prevent duplicate events
-            socket.off("online-users");
-            socket.on("online-users", (users) => {
-              setUsersList(users);
-            });
           }
 
           console.log("User authenticated with valid token.");
@@ -86,18 +84,23 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Listen for the "online-users" event from the server
-    socket.on("online-users", (users) => {
-      console.log("Received online users:", users);
-      setUsersList(users);
+    socket.on("online-users", async (users) => {
+      const connectedUsers = await getConnectedUsers(users);
+      console.log(connectedUsers.connectedUsers);
+
+      setUsersList(
+        connectedUsers.connectedUsers.filter(
+          (user) => user._id !== userData._id
+        )
+      );
     });
 
     // Cleanup listener when component unmounts
     return () => {
       socket.off("online-users");
     };
-  }, []);
+  }, [userData]);
 
-  
   const authContextRegister = async (user) => {
     setIsLoading(true);
     try {
@@ -138,8 +141,6 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await login(user);
-      console.log(response);
-      
       localStorage.setItem("profilesAuthToken", response.token);
       setUserData({
         _id: response.user._id,
@@ -157,11 +158,6 @@ export const AuthProvider = ({ children }) => {
         socket.emit("user-join", response.user._id);
         socket.emit("get-online-users");
 
-        // Clean previous listener to prevent duplicate events
-        socket.off("online-users");
-        socket.on("online-users", (users) => {
-          setUsersList(users);
-        });
         return () => {
           socket.off("online-users");
         };
@@ -184,7 +180,7 @@ export const AuthProvider = ({ children }) => {
         authContextEditUser,
         userData,
         isLoading,
-        usersList
+        usersList,
       }}
     >
       {children}

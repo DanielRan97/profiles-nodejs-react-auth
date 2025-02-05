@@ -37,7 +37,7 @@ const ProfileImg = ({ user }) => {
       <label htmlFor="profileImgInput" className={classes.profileImgWrapper}>
         <img
           src={profileImg}
-          alt="User profile"
+          alt="User profile img"
           className={classes.profileImg}
         />
         <div className={classes.overlay}>Change Profile Img</div>

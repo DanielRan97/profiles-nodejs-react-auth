@@ -91,6 +91,16 @@ export const verifyCode = async (email, code) => {
   }
 };
 
+//get User By Id
+export const getUserById = async (id) => {
+  try {
+    const res = await API.get(`/user/${id}`);
+    return res.data.user;
+  } catch (error) {
+    throw error.response?.data?.message || "Error't finding User";
+  }
+}
+
 //Edir User 
 export const editUser = async ({ fullName, nickName, email, profileImage, _id, tokem }) => {
   const formData = new FormData();
@@ -104,6 +114,17 @@ export const editUser = async ({ fullName, nickName, email, profileImage, _id, t
     const response = await API.put(`/user/${_id}`, formData, {
       headers: { "Content-Type": "multipart/form-data", "Authorization" : `Bearer ${tokem}` },
     });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+//Get connected users
+export const getConnectedUsers = async (connectedUsers) => {
+
+  try {
+    const response = await API.post("/get-connected-users/", {connectedUsers});
     return response.data;
   } catch (error) {
     throw error;

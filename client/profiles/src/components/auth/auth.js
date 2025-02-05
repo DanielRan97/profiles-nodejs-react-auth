@@ -94,8 +94,6 @@ const Auth = () => {
   const authHandler = async () => {
     setAuthSuccess("");
     setFormError("");
-    console.log(profileImage);
-    
     if (formType === "signUp") {
       const user = {
         fullName: authFormState.fullName.value,
@@ -125,8 +123,6 @@ const Auth = () => {
         await authContextLogin(user);
         navigate("/profile");
       } catch (error) {
-        console.log(error);
-
         setFormError(error.response?.data?.message || "Login failed.");
       }
     }

@@ -1,6 +1,11 @@
-.profileContainer{
-    padding: 30px;
+.profileContainer {
     display: flex;
-    align-items: flex-start baseline;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .chatArea{
+    display: flex;
     justify-content: space-between;
-}
+    padding: 20px;
+  }

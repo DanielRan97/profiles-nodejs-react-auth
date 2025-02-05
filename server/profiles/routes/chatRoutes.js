@@ -10,11 +10,12 @@ router.post("/send", verifyToken, async (req, res) => {
     const senderId = req.user.id; // ✅ Get senderId from `req.user`, NOT `req.body`
 
     if (!receiverId || !message) {
-      return res.status(400).json({ error: "Receiver ID and message are required" });
+      return res
+        .status(400)
+        .json({ error: "Receiver ID and message are required" });
     }
     const newMessage = new Message({ senderId, receiverId, message });
     await newMessage.save();
-
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ error: "Could not send message" });
@@ -22,11 +23,10 @@ router.post("/send", verifyToken, async (req, res) => {
 });
 
 // Get chat history (Protected Route)
-router.get("/:user2", verifyToken, async (req, res) => {
+router.get("/chatHistory/:user2", verifyToken, async (req, res) => {
   try {
-    const user1 = req.user.id; // ✅ Get userId from token
+    const user1 = req.user.id;
     const { user2 } = req.params;
-
     const messages = await Message.find({
       $or: [
         { senderId: user1, receiverId: user2 },
