@@ -25,12 +25,15 @@ export const sendMessage = async (senderId, receiverId, message) => {
       receiverId,
       message,
     });
+    console.log('massegae sent!');
 
     if (response.status === 201) {
       socket.emit("private-message", { senderId, receiverId, message });
+      console.log('the server got the maessage');
       return response.data;
     }
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -43,3 +46,14 @@ export const getMessagesHistory = async (user2Id) => {
     throw error;
   }
 };
+
+//Mark messages as "read"
+export const markMessagesAsRead = async (senderId, receiverId) => {
+  try {
+    const response = await API.put(`/readAllMessages/${senderId}/${receiverId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+

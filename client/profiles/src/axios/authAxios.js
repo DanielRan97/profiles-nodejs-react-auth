@@ -50,7 +50,7 @@ export const register = async ({ fullName, nickName, password, email, profileIma
     });
     return response.data;
   } catch (error) {
-    throw error;
+    throw error.response.data.message;
   }
 };
 

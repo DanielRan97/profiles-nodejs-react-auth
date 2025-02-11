@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../contexts/authContext";
@@ -82,6 +82,10 @@ const Auth = () => {
     }));
   };
 
+  useEffect(() => {
+    setFormError("");
+  }, [formType]);
+
   const isFormValid = () => {
     return Object.values(authFormState).every((field) => {
       if (!field.target.includes(formType)) {
@@ -112,7 +116,7 @@ const Auth = () => {
           setFormType("login");
         }
       } catch (error) {
-        setFormError(error.response?.data?.error?.message || "Sign Up failed.");
+        setFormError(error);
       }
     } else {
       const user = {

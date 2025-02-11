@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import classes from "../auth.module.css";
-import { sendCode, verifyCode } from "../../../axios/auth";
+import { sendCode, verifyCode } from "../../../axios/authAxios";
 const VerificationForm = ({ email, setAuthSuccess, setFormError }) => {
   const [code, setCode] = useState("");
 

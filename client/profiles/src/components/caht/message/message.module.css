@@ -1,0 +1,39 @@
+
+.myMessage {
+
+    background-color: #61dafb;
+    color: black;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 50%;
+    text-align: left;
+    margin-right: auto;
+    margin-left: 7px;
+    margin: 10px auto 7px 4px;
+
+}
+
+.userMessage {
+
+    background-color: #EAEAEA;
+    color: black;
+    padding: 8px;
+    border-radius: 8px;
+    max-width: 50%;
+    text-align: right;
+    margin-left: auto;
+    margin-right: 7px;
+    margin: 10px 4px 7px auto;
+}
+
+.messageP {
+    margin: 0px;
+}
+
+.nickName{
+    margin: 0px;
+    text-align: left;
+    font-size: 13px;
+    text-decoration: underline;
+    font-weight: bold;
+}

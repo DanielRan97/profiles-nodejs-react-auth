@@ -10,7 +10,12 @@ const fs = require("fs");
 const path = require("path");
 
 // Upload directory to be inside `server/profileImgs`**
-const uploadDir = path.join(__dirname, "..", "..", "/profiles/assets/images/profileImgs");
+const uploadDir = path.join(
+  __dirname,
+  "..",
+  "..",
+  "/profiles/assets/images/profileImgs"
+);
 
 // Ensure directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -36,17 +41,19 @@ const upload = multer({ storage });
 router.post("/register", upload.single("profileImage"), async (req, res) => {
   try {
     const { fullName, email, nickName, password } = req.body;
-    const profileImage = req.file ? `/profiles/assets/images/profileImgs/${req.file.filename}` : null;
+    const profileImage = req.file
+      ? `/profiles/assets/images/profileImgs/${req.file.filename}`
+      : null;
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res
         .status(400)
-        .json({ message: "Email already in use. Try to Login" });
+        .json({ message: `${email} already in use. Try to Login` });
     }
 
     const existingUser = await User.findOne({ nickName });
     if (existingUser) {
-      return res.status(400).json({ message: "NickName already in use" });
+      return res.status(400).json({ message: `${nickName} already in use` });
     }
 
     const user = new User({
@@ -66,7 +73,7 @@ router.post("/register", upload.single("profileImage"), async (req, res) => {
       user,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ error });
   }
 });
 
@@ -89,7 +96,7 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json({ message: "Login successful", user, token });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ error });
   }
 });
 
@@ -109,30 +116,44 @@ router.post("/protected", verifyToken, async (req, res) => {
 
     return res.status(200).json({ message: "Protected route accessed", user });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 //Edit User
-router.put("/user/:id", verifyToken, upload.single("profileImage"), async (req, res) => {
-  try {
-    const { fullName, email, nickName, password } = req.body;
-    const profileImage = req.file ? `/profiles/assets/images/profileImgs/${req.file.filename}` : undefined;
+router.put(
+  "/user/:id",
+  verifyToken,
+  upload.single("profileImage"),
+  async (req, res) => {
+    try {
+      const { fullName, email, nickName, password } = req.body;
+      const profileImage = req.file
+        ? `/profiles/assets/images/profileImgs/${req.file.filename}`
+        : undefined;
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { fullName, email, nickName, password, ...(profileImage && { profileImage }) },
-      { new: true }
-    );
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          fullName,
+          email,
+          nickName,
+          password,
+          ...(profileImage && { profileImage }),
+        },
+        { new: true }
+      );
 
-    if (!updatedUser) return res.status(404).json({ message: "User not found" });
-    res.status(200).json({ message: "User updated successfully", updatedUser });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+      if (!updatedUser)
+        return res.status(404).json({ message: "User not found" });
+      res
+        .status(200)
+        .json({ message: "User updated successfully", updatedUser });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error });
+    }
   }
-});
+);
 
 //Get user by id
 router.get("/user/:id", verifyToken, async (req, res) => {
@@ -141,7 +162,7 @@ router.get("/user/:id", verifyToken, async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json({ message: "User Found", user });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ error });
   }
 });
 
@@ -151,18 +172,25 @@ router.post("/get-connected-users", verifyToken, async (req, res) => {
     const { connectedUsers } = req.body;
 
     if (!Array.isArray(connectedUsers) || connectedUsers.length === 0) {
-      return res.status(200).json({ message: "No connected users provided", connectedUsers: [] });
+      return res
+        .status(200)
+        .json({ message: "No connected users provided", connectedUsers: [] });
     }
 
-    const users = await User.find({ _id: { $in: connectedUsers } }, "userName fullName profileImage nickName");
+    const users = await User.find(
+      { _id: { $in: connectedUsers } },
+      "userName fullName profileImage nickName"
+    );
 
     if (!users || users.length === 0) {
-      return res.status(200).json({ message: "Users not found", connectedUsers: [] });
+      return res
+        .status(200)
+        .json({ message: "Users not found", connectedUsers: [] });
     }
 
     res.status(200).json({ message: "Users found", connectedUsers: users });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -170,10 +198,11 @@ router.post("/get-connected-users", verifyToken, async (req, res) => {
 router.delete("/user/:id", verifyToken, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
-    if (!deletedUser) return res.status(404).json({ message: "User not found" });
+    if (!deletedUser)
+      return res.status(404).json({ message: "User not found" });
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ error });
   }
 });
 

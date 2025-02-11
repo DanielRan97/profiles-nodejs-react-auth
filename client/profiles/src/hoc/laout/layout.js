@@ -6,14 +6,13 @@ import Nav from "./nav/nav";
 const Layout = () => {
 
     return(
-        <div>
+        <div className={classes.layOut}>
             <header>
                 <Nav />
             </header>
-            <main className={classes.layoutMain}>
+            <main>
                 <Router />
             </main>
-            <footer className={classes.layoutFooter}></footer>
         </div>
     );
 };

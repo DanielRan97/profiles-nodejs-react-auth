@@ -12,7 +12,7 @@ module.exports = (server) => {
   io.on("connection", async (socket) => {
 
     socket.on("user-join", (userId) => {
-
+      console.log(chalk.bgBlue.white(`${userId} connected`));
       onlineUsers.set(userId, socket.id);
       io.emit("online-users", Array.from(onlineUsers.keys()));
     });
@@ -23,6 +23,7 @@ module.exports = (server) => {
         try {
           io.to(receiverSocketId).emit("new-message", {
             senderId,
+            receiverId,
             message,
             time: new Date().toString(),
           });
@@ -41,6 +42,7 @@ module.exports = (server) => {
     socket.on("disconnect", () => {
       for (const [userId, id] of onlineUsers.entries()) {
         if (id === socket.id) {
+          console.log(chalk.bgRed.white(`${userId} disconnected`));
           onlineUsers.delete(userId);
           break;
         }

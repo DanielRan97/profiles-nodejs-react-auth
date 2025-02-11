@@ -7,7 +7,7 @@ const AuthForm = ({
   setFormType,
   isFormValid,
   authHandler,
-  setProfileImage
+  setProfileImage,
 }) => {
   return (
     <div>
@@ -33,15 +33,17 @@ const AuthForm = ({
             )}
           </div>
         ))}
-        {formType === "signUp" &&<div className={classes.signUpFormInputDiv}>
-          <label>Profile Image (optional)</label>
-          <input
-          className={classes.input}
-            type="file"
-            accept="image/*"
-            onChange={(e) => setProfileImage(e.target.files[0])}
-          />
-        </div>}
+        {formType === "signUp" && (
+          <div className={classes.signUpFormInputDiv}>
+            <label>Profile Image (optional)</label>
+            <input
+              className={classes.input}
+              type="file"
+              accept="image/*"
+              onChange={(e) => setProfileImage(e.target.files[0])}
+            />
+          </div>
+        )}
         <p
           className={classes.switchFormP}
           onClick={() =>

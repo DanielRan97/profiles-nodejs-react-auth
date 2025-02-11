@@ -8,4 +8,7 @@
     display: flex;
     justify-content: space-between;
     padding: 20px;
+    background-color: #0074D9;
+    height: 350px;
+    border: 1px solid black;
   }

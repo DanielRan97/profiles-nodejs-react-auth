@@ -7,14 +7,19 @@ const router = express.Router();
 router.post("/send", verifyToken, async (req, res) => {
   try {
     const { receiverId, message } = req.body;
-    const senderId = req.user.id; // ✅ Get senderId from `req.user`, NOT `req.body`
+    const senderId = req.user.id;
 
     if (!receiverId || !message) {
       return res
         .status(400)
         .json({ error: "Receiver ID and message are required" });
     }
-    const newMessage = new Message({ senderId, receiverId, message });
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      message,
+      read: false,
+    });
     await newMessage.save();
     res.status(201).json(newMessage);
   } catch (error) {
@@ -37,6 +42,34 @@ router.get("/chatHistory/:user2", verifyToken, async (req, res) => {
     res.json(messages);
   } catch (error) {
     res.status(500).json({ error: "Could not fetch messages" });
+  }
+});
+
+//Mark messages as "read"
+router.put("/readAllMessages/:senderId/:receiverId", verifyToken, async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.params;
+    console.log(receiverId, receiverId);
+
+    // Update all messages where senderId matches
+    const updatedMessages = await Message.updateMany(
+      { senderId: senderId ,receiverId: receiverId },
+      { $set: { read: true } },
+      { new: true }
+    );
+
+    if (updatedMessages.matchedCount === 0) {
+      return res
+        .status(200)
+        .json({ message: "No messages found for this sender" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Messages updated successfully", updatedMessages });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error", error });
   }
 });
 

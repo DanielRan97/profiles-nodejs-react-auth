@@ -5,9 +5,10 @@ import {
   API,
   editUser,
   getConnectedUsers,
-} from "../axios/auth";
+} from "../axios/authAxios";
 import { jwtDecode } from "jwt-decode";
 import { socket } from "../socket/socket";
+import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -17,6 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [usersList, setUsersList] = useState([]);
+  const navigate = useNavigate();
 
   const authContextLogout = useCallback(() => {
     localStorage.removeItem("profilesAuthToken");
@@ -24,7 +26,8 @@ export const AuthProvider = ({ children }) => {
     setUserData(null);
     setIsLoggedIn(false);
     setIsLoading(false);
-  }, []);
+    navigate("/auth")
+  }, [navigate]);
 
   useEffect(() => {
     const checkTokenValidity = async () => {
@@ -86,8 +89,6 @@ export const AuthProvider = ({ children }) => {
     // Listen for the "online-users" event from the server
     socket.on("online-users", async (users) => {
       const connectedUsers = await getConnectedUsers(users);
-      console.log(connectedUsers.connectedUsers);
-
       setUsersList(
         connectedUsers.connectedUsers.filter(
           (user) => user._id !== userData._id
