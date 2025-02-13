@@ -49,8 +49,6 @@ router.get("/chatHistory/:user2", verifyToken, async (req, res) => {
 router.put("/readAllMessages/:senderId/:receiverId", verifyToken, async (req, res) => {
   try {
     const { senderId, receiverId } = req.params;
-    console.log(receiverId, receiverId);
-
     // Update all messages where senderId matches
     const updatedMessages = await Message.updateMany(
       { senderId: senderId ,receiverId: receiverId },
@@ -68,7 +66,6 @@ router.put("/readAllMessages/:senderId/:receiverId", verifyToken, async (req, re
       .status(200)
       .json({ message: "Messages updated successfully", updatedMessages });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Server error", error });
   }
 });

@@ -12,6 +12,7 @@ const Chat = ({
   message,
   messageError,
   userData,
+  selectUserHandler,
   empytChatAlert,
 }) => {
   const contentRef = useRef(null);
@@ -38,20 +39,38 @@ const Chat = ({
         <Message
           text={value.message}
           date={value.createdAt}
-          data={{ senderId: value.senderId, userId: selectUser._id, userData, selectUser }}
+          data={{
+            senderId: value.senderId,
+            userId: selectUser._id,
+            userData,
+            selectUser,
+          }}
         />
       </div>
     ));
   };
 
-  const handleMesggaeSend= () => {
+  const handleMesggaeSend = () => {
     textAreaRef.current.focus();
     sendMessageHandler();
-  }
+  };
 
   return (
     <div className={classes.chat}>
-      <h3>{selectUser?.nickName}</h3>
+      <div className={classes.chatHeader}>
+        <div></div>
+        <h3>{selectUser?.nickName}</h3>
+        <button
+          className={classes.closeChatButton}
+          type="button"
+          onClick={() => {
+            selectUserHandler(selectUser, userData);
+          }}
+        >
+          X
+        </button>
+      </div>
+
       <div className={classes.messagesList} ref={contentRef}>
         {empytChatAlert === "" ? MessagesListDiv() : <p>{empytChatAlert}</p>}
       </div>

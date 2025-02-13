@@ -2,16 +2,16 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_dev_secret";
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1]; // Expect "Bearer <token>"
+  const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET); // Verify token
-    req.user = decoded; // ✅ Attach decoded user to `req.user`, NOT `req.body`
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
 
-    next(); // Continue to the next middleware or route handler
+    next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });

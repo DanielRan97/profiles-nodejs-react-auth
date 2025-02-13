@@ -17,7 +17,7 @@ initializeSocket(server);
 
 // Middleware
 app.use(cors({ origin: "http://localhost:3000" }));
-app.use(express.json()); // ✅ Use ONLY express.json() for parsing JSON
+app.use(express.json()); 
 
 // Database connection
 const MONGO_URI = "mongodb://localhost:27017/profiles";
@@ -34,7 +34,7 @@ mongoose.connection.on("connected", () => {
 app.use("/auth", authRoutes);
 app.use("/chat", chatRoutes);
 
-// ✅ Start server correctly
+// Start server correctly
 server.listen(PORT, () => {
   console.log(chalk.black.bold.bgWhite(`Server running on http://localhost:${PORT}`));
 });

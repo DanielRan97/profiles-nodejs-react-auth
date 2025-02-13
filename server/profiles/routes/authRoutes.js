@@ -17,12 +17,9 @@ const uploadDir = path.join(
   "/profiles/assets/images/profileImgs"
 );
 
-// Ensure directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
-
-// Serve images statically
 router.use("/profiles/assets/images/profileImgs", express.static(uploadDir));
 
 // Configure Multer storage
@@ -103,7 +100,6 @@ router.post("/login", async (req, res) => {
 // Protected route
 router.post("/protected", verifyToken, async (req, res) => {
   try {
-    // Access the authenticated user's data from req.user set by the verifyToken middleware
     const userId = req.body.user && req.body.user.id;
     if (!userId) {
       return res.status(400).json({ message: "Invalid user ID" });

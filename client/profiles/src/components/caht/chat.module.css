@@ -8,6 +8,27 @@
     border:  1px solid black;
 }
 
+.chatHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 3px;
+    border-bottom: black 1px solid;
+}
+
+.closeChatButton{
+    height: 20px;
+    width: 28px;
+    background-color: black;
+    color: red;
+    border: 1px black solid;
+    cursor: pointer;
+}
+
+.closeChatButton:hover{
+    color: gray;
+}
+
 .chatActionsDiv{
     display: flex;
     width: 100%;

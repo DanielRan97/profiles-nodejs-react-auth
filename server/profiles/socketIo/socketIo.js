@@ -5,14 +5,13 @@ const onlineUsers = new Map();
 module.exports = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: "*", // Adjust this for security
+      origin: "*",
     },
   });
 
   io.on("connection", async (socket) => {
 
     socket.on("user-join", (userId) => {
-      console.log(chalk.bgBlue.white(`${userId} connected`));
       onlineUsers.set(userId, socket.id);
       io.emit("online-users", Array.from(onlineUsers.keys()));
     });
@@ -28,7 +27,6 @@ module.exports = (server) => {
             time: new Date().toString(),
           });
         } catch (error) {
-          console.log(error);
           throw error;
         }
       }
@@ -42,7 +40,6 @@ module.exports = (server) => {
     socket.on("disconnect", () => {
       for (const [userId, id] of onlineUsers.entries()) {
         if (id === socket.id) {
-          console.log(chalk.bgRed.white(`${userId} disconnected`));
           onlineUsers.delete(userId);
           break;
         }

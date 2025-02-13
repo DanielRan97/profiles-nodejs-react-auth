@@ -30,7 +30,6 @@ export const ChatProvider = ({ children }) => {
 
   const listenAndgetNewMessage = useCallback((userData, selectUser) => {
     setMessageError("");
-    // Remove any existing listeners to prevent duplicates
     socket.off("new-message");
     socket.on("new-message", async (newMsg) => {
       if (
@@ -43,7 +42,6 @@ export const ChatProvider = ({ children }) => {
       }
     });
     return () => {
-      // Cleanup when component unmounts or dependencies change
       socket.off("new-message");
     };
   }, []);
@@ -61,7 +59,6 @@ export const ChatProvider = ({ children }) => {
       setMessagesList((prev) => [...prev, res]);
       setEmpytChatAlert("");
     } catch (error) {
-      console.log(error);
       setMessageError(error.message);
     }
   };
@@ -84,7 +81,6 @@ export const ChatProvider = ({ children }) => {
         await markMessagesAsRead(user._id, userData._id);
         setMessagesList(res.data);
       } catch (error) {
-        console.log(error);
         setMessageError(error.message);
       }
     }

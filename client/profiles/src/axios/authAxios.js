@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Set up the base URL for your API
 export const API = axios.create({
-  baseURL: "http://localhost:4000/auth", // Replace with your API base URL
+  baseURL: "http://localhost:4000/auth",
 });
 
 // Request interceptor to attach the token
@@ -10,7 +10,7 @@ API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("profilesAuthToken");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Attach token to Authorization header
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -101,7 +101,7 @@ export const getUserById = async (id) => {
   }
 }
 
-//Edir User 
+//Edit User
 export const editUser = async ({ fullName, nickName, email, profileImage, _id, tokem }) => {
   const formData = new FormData();
   formData.append("nickName", nickName);

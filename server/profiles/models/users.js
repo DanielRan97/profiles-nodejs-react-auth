@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
           "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.",
       },
     },
-    profileImage: { type: String, required: false }, // Image URL
+    profileImage: { type: String, required: false },
   },
   { timestamps: true }
 );
@@ -69,7 +69,6 @@ userSchema.methods.validatePassword = async function (password) {
 userSchema.pre("remove", async function (next) {
   if (this.profileImage) {
     try {
-      // Extract filename from the URL
       const imageFilename = this.profileImage.split("/").pop();
       const imagePath = path.join(
         __dirname,
@@ -80,12 +79,12 @@ userSchema.pre("remove", async function (next) {
       // Check if file exists before deleting
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
-          if (err) console.error("Error deleting profile image:", err);
-          else console.log("Profile image deleted:", imagePath);
+          if (err) res.status(500).json({ err });
+          else res.status(200).json({ message: "User deleted successfully", imagePath });
         });
       }
     } catch (error) {
-      console.error("Error handling profile image deletion:", error);
+      res.status(500).json({ error });
     }
   }
   next();

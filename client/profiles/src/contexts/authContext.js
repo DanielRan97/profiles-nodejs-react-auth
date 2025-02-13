@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("profilesAuthToken");
 
       if (!token) {
-        console.log("No token found, user not logged in.");
         setIsLoading(false);
         return;
       }
@@ -57,16 +56,12 @@ export const AuthProvider = ({ children }) => {
             _id: response.data.user._id,
           });
 
-          // Connect the socket only once when the user is authenticated
           if (!socket.connected) {
             socket.connect();
             socket.emit("user-join", response.data.user._id);
             socket.emit("get-online-users");
 
-            // Clean previous listener to prevent duplicate events
           }
-
-          console.log("User authenticated with valid token.");
         }
       } catch (error) {
         console.error("Invalid token, logging out.", error);
@@ -78,7 +73,6 @@ export const AuthProvider = ({ children }) => {
 
     checkTokenValidity();
 
-    // Cleanup function to remove socket listeners when component unmounts
     return () => {
       socket.off("online-users");
       socket.disconnect();
@@ -86,7 +80,6 @@ export const AuthProvider = ({ children }) => {
   }, [authContextLogout]);
 
   useEffect(() => {
-    // Listen for the "online-users" event from the server
     socket.on("online-users", async (users) => {
       const connectedUsers = await getConnectedUsers(users);
       setUsersList(
@@ -96,7 +89,6 @@ export const AuthProvider = ({ children }) => {
       );
     });
 
-    // Cleanup listener when component unmounts
     return () => {
       socket.off("online-users");
     };
@@ -153,7 +145,6 @@ export const AuthProvider = ({ children }) => {
 
       setIsLoggedIn(true);
 
-      // Ensure socket connects after login
       if (!socket.connected) {
         socket.connect();
         socket.emit("user-join", response.user._id);
@@ -164,7 +155,6 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
-      console.log(error);
       throw error;
     } finally {
       setIsLoading(false);

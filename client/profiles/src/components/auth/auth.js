@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../contexts/authContext";
 import AuthForm from "./authForm/authForm";
-import VerificationForm from "../auth/verificationForm/verificationForm";
 import classes from "./auth.module.css";
 
 const Auth = () => {
@@ -12,7 +11,6 @@ const Auth = () => {
   const [formType, setFormType] = useState("signUp");
   const [formError, setFormError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
-  const [verified, setVerified] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [authFormState, setAuthFormState] = useState({
     fullName: {
@@ -112,7 +110,6 @@ const Auth = () => {
           `${authFormState.fullName.value} signed up successfully. You can now login.`
         );
         if (res) {
-          //setVerified(true);
           setFormType("login");
         }
       } catch (error) {
@@ -132,13 +129,7 @@ const Auth = () => {
     }
   };
 
-  const form = verified ? (
-    <VerificationForm
-      setFormError={(message) => setFormError(message)}
-      setAuthSuccess={(message) => setAuthSuccess(message)}
-      email={authFormState.email.value}
-    />
-  ) : (
+  const form =  (
     <AuthForm
       isFormValid={isFormValid}
       setFormType={setFormType}

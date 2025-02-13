@@ -44,6 +44,7 @@ const ProfileContainer = () => {
             messageError={messageError}
             userData={userData}
             empytChatAlert={empytChatAlert}
+            selectUserHandler={(user) => selectUserHandler(user, userData)}
           />
         ) : <h3>No selected chat</h3>}
         <div></div>
